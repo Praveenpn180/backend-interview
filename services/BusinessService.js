@@ -10,11 +10,58 @@ class BusinessService {
   }
 
   async getBusinessListViaBusinesses() {
-    return [{ message: 'List via businesses' }];
+
+    const businesses =await BusinessModel.aggregate([
+      {
+        '$lookup': {
+          'from': 'UserMaster', 
+          'localField': '_id', 
+          'foreignField': 'businessId', 
+          'as': 'result'
+        }
+      }, {
+        '$project': {
+          'businessName': 1, 
+          'userCount': {
+            '$size': '$result'
+          }, 
+          '_id': 0
+        }
+      }
+    ])
+    return businesses;
   }
 
   async getBusinessListViaUsers() {
-    return [{ message: 'List via users' }];
+
+    const businesses = await UserModel.aggregate([
+      {
+        '$group': {
+          '_id': '$businessId', 
+          'userCount': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$lookup': {
+          'from': 'BusinessMaster', 
+          'localField': '_id', 
+          'foreignField': '_id', 
+          'as': 'result'
+        }
+      }, {
+        '$unwind': {
+          'path': '$result'
+        }
+      }, {
+        '$project': {
+          'userCount': 1, 
+          '_id': 0, 
+          'businessName': '$result.businessName'
+        }
+      }
+    ])
+    return businesses;
   }
 }
 

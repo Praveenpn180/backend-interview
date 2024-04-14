@@ -16,16 +16,14 @@ class BusinessService {
           from: 'UserMaster',
           localField: '_id',
           foreignField: 'businessId',
-          as: 'result',
+          as: 'users',
         },
       },
       {
         $project: {
-          businessName: 1,
-          userCount: {
-            $size: '$result',
-          },
           _id: 0,
+          businessName: 1,
+          userCount: { $size: '$users' },
         },
       },
     ]);
@@ -37,9 +35,7 @@ class BusinessService {
       {
         $group: {
           _id: '$businessId',
-          userCount: {
-            $sum: 1,
-          },
+          userCount: { $sum: 1 },
         },
       },
       {
@@ -47,19 +43,17 @@ class BusinessService {
           from: 'BusinessMaster',
           localField: '_id',
           foreignField: '_id',
-          as: 'result',
+          as: 'business',
         },
       },
       {
-        $unwind: {
-          path: '$result',
-        },
+        $unwind: { path: '$business' },
       },
       {
         $project: {
-          userCount: 1,
           _id: 0,
-          businessName: '$result.businessName',
+          businessName: '$business.businessName',
+          userCount: 1,
         },
       },
     ]);

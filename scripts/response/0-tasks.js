@@ -27,7 +27,7 @@
 /**
  * =====
  * =====
- * Task 4: Console prime numbers from 1 to 1000. After consoling every number, the program should pause for 5-10 seconds before it consoles the next number.
+ * Task 4: Console prime numbers from 1 to 1000. After consoling every number, the program should pause for 5-10 seconds (random number) before it consoles the next number.
  * =====
  * =====
  */

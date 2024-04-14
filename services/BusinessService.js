@@ -27,6 +27,7 @@ class BusinessService {
         },
       },
     ]);
+
     return businesses;
   }
 
@@ -57,6 +58,7 @@ class BusinessService {
         },
       },
     ]);
+
     return businesses;
   }
 }

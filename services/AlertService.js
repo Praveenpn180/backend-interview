@@ -10,13 +10,12 @@ class AlertService {
   }
 
   async getAlertCountViaAlerts() {
+    // TODO: We need to group by 'type.severity' instead of 'type'
     const alertCount = await AlertModel.aggregate([
       {
         $group: {
           _id: '$type',
-          count: {
-            $sum: 1,
-          },
+          count: { $sum: 1 },
         },
       },
       {
@@ -24,39 +23,37 @@ class AlertService {
           from: 'LookupMaster',
           localField: '_id',
           foreignField: '_id',
-          as: 'result',
+          as: 'monitoringAlert',
         },
       },
       {
-        $unwind: {
-          path: '$result',
-        },
+        $unwind: { path: '$monitoringAlert' },
       },
       {
         $lookup: {
           from: 'LookupMaster',
-          localField: 'result.severity',
+          localField: 'monitoringAlert.severity',
           foreignField: '_id',
-          as: 'result2',
+          as: 'monitoringAlertSeverity',
         },
       },
       {
-        $unwind: {
-          path: '$result2',
-        },
+        $unwind: { path: '$monitoringAlertSeverity' },
       },
       {
         $project: {
-          count: 1,
-          label: '$result2.label',
           _id: 0,
+          count: 1,
+          label: '$monitoringAlertSeverity.label',
         },
       },
     ]);
+
     return alertCount;
   }
 
   async getAlertCountViaLookup() {
+    // TODO: We need to aggregate via 'type.severity' instead of 'type'
     const alertCount = await MonitoringAlertSeverityModel.aggregate([
       {
         $lookup: {
@@ -67,10 +64,7 @@ class AlertService {
         },
       },
       {
-        $unwind: {
-          path: '$monitoringAlert',
-          preserveNullAndEmptyArrays: false,
-        },
+        $unwind: { path: '$monitoringAlert' },
       },
       {
         $lookup: {
@@ -83,21 +77,18 @@ class AlertService {
       {
         $group: {
           _id: '$label',
-          count: {
-            $sum: {
-              $size: '$alertDetails',
-            },
-          },
+          count: { $sum: { $size: '$alertDetails' } },
         },
       },
       {
         $project: {
-          label: '$_id',
           _id: 0,
           count: 1,
+          label: '$_id',
         },
       },
     ]);
+
     return alertCount;
   }
 }

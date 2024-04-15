@@ -53,8 +53,10 @@ class AlertService {
   }
 
   async getAlertCountViaLookup() {
-    // TODO: We need to aggregate via 'type.severity' instead of 'type'
     const alertCount = await MonitoringAlertSeverityModel.aggregate([
+      {
+        $match: { type: 'MONITORING_ALERT_SEVERITY' },
+      },
       {
         $lookup: {
           from: 'LookupMaster',
@@ -64,7 +66,7 @@ class AlertService {
         },
       },
       {
-        $unwind: { path: '$monitoringAlert' },
+        $unwind: { path: '$monitoringAlert', preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {

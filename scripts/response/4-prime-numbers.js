@@ -12,17 +12,14 @@ const isPrime = (num) => {
 };
 
 const getPrimeNumbersUnderThousand = () => {
-  let num = 2;
-  const interval = setInterval(() => {
-    if (num >= 1000) {
-      clearInterval(interval);
-      return;
+  let interval = 0;
+  for (let i = 2; i < 1000; i++) {
+    if (isPrime(i)) {
+      setTimeout((num) => {
+        console.log(num);
+      }, interval += Math.ceil(Math.random() * 5000) + 5000, i);
     }
-    if (isPrime(num)) {
-      console.log(num);
-    }
-    num++;
-  }, 5000);
+  }
 };
 
 getPrimeNumbersUnderThousand();
